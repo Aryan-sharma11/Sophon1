@@ -1,0 +1,63 @@
+;
+; ProcessBlocker.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class = System
+ClassGuid = {4d36e97d-e325-11ce-bfc1-08002be10318}  ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = ProcessBlocker.cat
+DriverVer   =  ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+ProcessBlocker.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$ ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$]
+%ProcessBlocker.DeviceDesc% = ProcessBlocker_Device, Root\ProcessBlocker ; TODO: edit hw-id
+
+[ProcessBlocker_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+ProcessBlocker.sys
+
+;-------------- Service installation
+[ProcessBlocker_Device.NT.Services]
+AddService = ProcessBlocker,%SPSVCINST_ASSOCSERVICE%, ProcessBlocker_Service_Inst
+
+; -------------- ProcessBlocker driver install sections
+[ProcessBlocker_Service_Inst]
+DisplayName    = %ProcessBlocker.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\ProcessBlocker.sys
+
+[ProcessBlocker_Device.NT.Wdf]
+KmdfService = ProcessBlocker, ProcessBlocker_wdfsect
+
+[ProcessBlocker_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "ProcessBlocker Installation Disk"
+ProcessBlocker.DeviceDesc = "ProcessBlocker Device"
+ProcessBlocker.SVCDESC = "ProcessBlocker Service"
+ 
