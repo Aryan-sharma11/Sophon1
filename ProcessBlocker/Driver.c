@@ -23,7 +23,7 @@ void CreateProcessNotifyRoutine(PEPROCESS process, HANDLE pid, PPS_CREATE_NOTIFY
 }
 
 
-void UnloadMyDumbEDR(_In_ PDRIVER_OBJECT DriverObject) {
+void UnloadProcessBlocker(_In_ PDRIVER_OBJECT DriverObject) {
     DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "Unloading routine called\n");
     // Unset the callback
     PsSetCreateProcessNotifyRoutineEx(CreateProcessNotifyRoutine, TRUE);
@@ -43,7 +43,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
     NTSTATUS status;
 
     // Setting the unload routine to execute
-    DriverObject->DriverUnload = UnloadMyDumbEDR;
+    DriverObject->DriverUnload = UnloadProcessBlocker;
 
     // Initializing a device object and creating it
     PDEVICE_OBJECT DeviceObject;
@@ -59,7 +59,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
         &DeviceObject		   // the resulting pointer
     );
     if (!NT_SUCCESS(status)) {
-        DbgPrint("MyDumbEDR: Device creation failed: 0x%X\n", status);
+        DbgPrint("Sophon-ProcessBLocker: Device creation failed: 0x%X\n", status);
         return status;
     }
 

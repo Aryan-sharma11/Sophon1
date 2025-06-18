@@ -1,0 +1,72 @@
+; FileEnforce.inf
+
+[Version]
+Signature       = "$WINDOWS NT$"
+Class       = "Bottom"
+ClassGuid   = {21D41938-DAA8-4615-86AE-E37344C18BD8}
+Provider        = %ManufacturerName%
+CatalogFile     = FileEnforce.cat
+DriverVer       = *
+PnpLockdown     = 1
+
+[DestinationDirs]
+DefaultDestDir  = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+FileEnforce.sys = 1,,
+
+
+[DefaultInstall.NT$ARCH$]
+OptionDesc          = %ServiceDescription%
+CopyFiles           =  DriverCopyFiles
+
+[DriverCopyFiles]
+FileEnforce.sys
+
+[DefaultInstall.NT$ARCH$.Services]
+AddService = FileEnforce, %SPSVCINST_ASSOCSERVICE%, FileEnforce_Service
+
+[DefaultUninstall.NT$ARCH$]
+LegacyUninstall = 1
+DelFiles   = FileEnforce.DeleteDriverFiles
+
+[DefaultUninstall.NT$ARCH$.Services]
+DelService = FileEnforce,0x200      ;Ensure service is stopped before deleting
+
+
+[FileEnforce.DeleteDriverFiles]
+FileEnforce.sys
+
+[FileEnforce_Service]
+DisplayName    = %FileEnforce.SvcDesc%
+Dependencies   = FltMgr
+ServiceType    = 2                             ; SERVICE_KERNEL_DRIVER
+StartType      = 1                             ; SERVICE_DEMAND_START
+ErrorControl   = 1                             ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\FileEnforce.sys
+LoadOrderGroup = "FileEnforce bottom"
+AddReg         = FileEnforce.AddRegistry
+
+[FileEnforce.AddRegistry]
+HKR,,"SupportedFeatures",0x00010001,0xb
+HKR,"Instances","DefaultInstance",0x00000000,%DefaultInstance%
+HKR,"Instances\"%Instance1.Name%,"Altitude",0x00000000,%Instance1.Altitude%
+HKR,"Instances\"%Instance1.Name%,"Flags",0x00010001,%Instance1.Flags%
+
+[Strings]
+ManufacturerName        = "YourCompanyName"
+DiskName                = "FileEnforce Installation Disk"
+FileEnforce.DeviceDesc  = "FileEnforce Minifilter Driver"
+FileEnforce.SVCDESC     = "FileEnforce File System Minifilter"
+ServiceDescription = "File enforce"
+SPSVCINST_ASSOCSERVICE = 0x00000002
+    ; Allow all attachments
+;Instances specific information.
+Instance1.Altitude      = "47777"
+Instance1.Flags         = 0x0          
+DefaultInstance         = "FileEnforce Instance"
+Instance1.Name          = "FileEnforce Instance"
+
