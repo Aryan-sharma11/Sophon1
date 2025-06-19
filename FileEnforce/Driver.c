@@ -14,6 +14,17 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
     UNREFERENCED_PARAMETER(FltObjects);
     UNREFERENCED_PARAMETER(CompletionContext);
 
+    if (!Data || !FltObjects)
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+    if (FltObjects->FileObject->Flags & (FO_NAMED_PIPE | FO_MAILSLOT | FO_VOLUME_OPEN))
+    {
+        return FLT_PREOP_SUCCESS_NO_CALLBACK;
+    }
+
+
+   
     DbgPrint("FileEnforce: %wZ\n", &Data->Iopb->TargetFileObject->FileName);
 
     return FLT_PREOP_SUCCESS_NO_CALLBACK;
@@ -98,6 +109,7 @@ UNICODE_STRING SYM_LINK = RTL_CONSTANT_STRING(L"\\??\\BlockProcess");
 
 
 NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath) {
+    DbgPrintEx(DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "[RuleDrv] Filter attached.\n");
 
     UNREFERENCED_PARAMETER(RegistryPath);
     DbgPrint("Updated DriverEntry: Initializing driver...\n");
